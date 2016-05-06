@@ -84,23 +84,27 @@
 
 	<script type="text/javascript" src="./codebattle-visualizer.js"></script>
 	<script type="text/javascript">
+	  function load(str) {
+	    new codebattle.Visualizer().load({
+		    map: document.getElementById("cb-viz-map"),
+		    controls: document.getElementById("cb-viz-controls"),
+		    stats: document.getElementById("cb-viz-stats"),
+		    ranks: document.getElementById("cb-viz-ranks"),
+		    replayFile: str,
+	    });
+	  }
 		$("#upload-input").on('change', function() {
 			console.log($("#upload-input")[0].files[0]);
 			var file = $("#upload-input")[0].files[0];
 
 			var reader = new FileReader();
 			reader.onload = function(evt) {
-				new codebattle.Visualizer().load({
-					map: document.getElementById("cb-viz-map"),
-					controls: document.getElementById("cb-viz-controls"),
-					stats: document.getElementById("cb-viz-stats"),
-					ranks: document.getElementById("cb-viz-ranks"),
-					replayFile: evt.target.result,
-				});
+			  load(evt.target.result);
 			};
 			reader.readAsText(file);
 			$("#upload-info").hide();
 		});
+		if(location.search) fetch(decodeURIComponent(location.search.substr(1))).then(x => x.text()).then(x => load(evt.target.result));
 	</script>
 
 
