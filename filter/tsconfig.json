@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "system",
+        "target": "es6",
+        "noImplicitAny": true,
+        "outDir": "bin",
+        "sourceMap": true,
+        "jsx": "react"
+    },
+    "files": [
+        "src/app.tsx",
+        "typings/browser.d.ts"
+    ]
+}

@@ -1,0 +1,8 @@
+{
+  "ambientDependencies": {
+    "react": "registry:dt/react#0.14.0+20160423065914",
+    "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
+    "react-select": "registry:dt/react-select#1.0.0+20160505181745",
+    "whatwg-fetch": "registry:dt/whatwg-fetch#0.0.0+20160412133644"
+  }
+}
