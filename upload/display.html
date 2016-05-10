@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!-- saved from url=(0047)https://codeit.itdhosting.de:1337/my_replay.php -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>CodeBattle Server</title>
+
+		<script type="text/javascript" src="./jquery-2.2.3.min.js"></script>
+
+		<link rel="stylesheet" href="./tether.min.css">
+		<script src="./tether.min.js"></script>
+
+		<link rel="stylesheet" href="./bootstrap.min.css">
+		<script src="./bootstrap.js"></script>
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css">
+
+		<link rel="stylesheet" href="./bs-wizard.css">
+		<link rel="stylesheet" href="./style.css">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+	<body>
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="https://codeit.itdhosting.de:1337/">
+				<img src="./logo.png" style="height: 20px;">
+			</a>
+		</div>
+
+		<div class="collapse navbar-collapse" id="navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<li class=""><a href="https://codeit.itdhosting.de:1337/index.php">The Challenge</a></li>
+				<li class=""><a href="https://codeit.itdhosting.de:1337/support.php">News, Support &amp; FAQs</a></li>
+				<li class="dropdown ">
+					<a href="https://codeit.itdhosting.de:1337/my_replay.php#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Development <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li class=""><a href="https://codeit.itdhosting.de:1337/download.php">Download SDK</a></li>
+						<li class=""><a href="https://codeit.itdhosting.de:1337/tutorial.php">Tutorial</a></li>
+						<li class=""><a href="https://codeit.itdhosting.de:1337/upload.php">Upload AI</a></li>
+					</ul>
+				</li>
+				<li class="dropdown active">
+					<a href="https://codeit.itdhosting.de:1337/my_replay.php#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Live <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li class=""><a href="https://codeit.itdhosting.de:1337/statistics.php">Ranking</a></li>
+						<li class=""><a href="https://codeit.itdhosting.de:1337/list_games.php">Game History</a></li>
+						<li class=""><a href="https://codeit.itdhosting.de:1337/metrics.php">Running Games</a></li>
+						<li class=""><a href="https://codeit.itdhosting.de:1337/maps.php">Download Maps</a></li>
+						<li class="active"><a href="https://codeit.itdhosting.de:1337/my_replay.php">Watch Local Game</a></li>
+					</ul>
+				</li>
+
+
+				<li class="dropdown ">
+					<a href="https://codeit.itdhosting.de:1337/my_replay.php#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+													<li class=""><a href="https://codeit.itdhosting.de:1337/login.php">Login</a></li>
+							<li><a href="http://codeit.itdesign.de/anmeldung" target="_blank">Register</a></li>
+											</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+
+		<div class="container main-content">
+				
+								
+				<div class="info-section">
+					
+<h1>Game Replay</h1>
+
+	<div id="upload-info">
+		Select the <code>temp/recording.json</code> file to analyze your local games step by step.
+		<input type="file" id="upload-input">
+	</div>
+
+	<script type="text/javascript" src="./codebattle-visualizer.js"></script>
+	<script type="text/javascript">
+	  function load(str) {
+	    new codebattle.Visualizer().load({
+		    map: document.getElementById("cb-viz-map"),
+		    controls: document.getElementById("cb-viz-controls"),
+		    stats: document.getElementById("cb-viz-stats"),
+		    ranks: document.getElementById("cb-viz-ranks"),
+		    replayFile: str,
+	    });
+	    $("#upload-info").hide();
+	  }
+		$("#upload-input").on('change', function() {
+			console.log($("#upload-input")[0].files[0]);
+			var file = $("#upload-input")[0].files[0];
+
+			var reader = new FileReader();
+			reader.onload = function(evt) {
+			  load(evt.target.result);
+			};
+			reader.readAsText(file);
+		});
+		if(location.search) {
+		  if(location.search.startsWith("?gist=")) var url = `https://gist.githubusercontent.com/anonymous/${location.search.substr(6)}/raw`;
+		  else var url = location.search.substr(1);
+		  fetch(decodeURIComponent(url)).then(x => x.text()).then(x => load(x));
+		}
+	</script>
+
+
+	<div id="cb-viz-map">
+		<i class="fa fa-gear fa-spin"></i>
+	</div>
+
+	<div id="cb-viz-controls"></div>
+
+  <div class="row">
+    <div class="col-sm-7">
+			<div id="cb-viz-stats"></div>
+		</div>
+    <div class="col-sm-5">
+			<div id="cb-viz-ranks"></div>
+		</div>
+	</div>
+
+				</div>
+			</div>
+			<div style="clear:both"></div>
+		
+	
+
+
+<!-- Site generated in 4.4910907745361ms (sql queries took 0ms) --></body></html>
