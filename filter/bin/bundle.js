@@ -13666,12 +13666,122 @@ System.registerDynamic("npm:react-select@1.0.0-beta13/lib/Select.js", ["react", 
   return module.exports;
 });
 
-System.register("bin/app.js", ["react", "react-dom", "react-select"], function(exports_1, context_1) {
+System.registerDynamic("npm:strict-uri-encode@1.1.0.json", [], false, function() {
+  return {
+    "main": "index",
+    "format": "cjs",
+    "meta": {
+      "*.json": {
+        "format": "json"
+      }
+    }
+  };
+});
+
+System.registerDynamic("npm:strict-uri-encode@1.1.0/index.js", [], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = function(str) {
+    return encodeURIComponent(str).replace(/[!'()*]/g, function(c) {
+      return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+    });
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:query-string@4.1.0.json", [], false, function() {
+  return {
+    "main": "index",
+    "format": "cjs",
+    "meta": {
+      "*.json": {
+        "format": "json"
+      }
+    }
+  };
+});
+
+System.registerDynamic("npm:query-string@4.1.0/index.js", ["strict-uri-encode"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var strictUriEncode = $__require('strict-uri-encode');
+  function encode(value, strict) {
+    return strict ? strictUriEncode(value) : encodeURIComponent(value);
+  }
+  exports.extract = function(str) {
+    return str.split('?')[1] || '';
+  };
+  exports.parse = function(str) {
+    var ret = Object.create(null);
+    if (typeof str !== 'string') {
+      return ret;
+    }
+    str = str.trim().replace(/^(\?|#|&)/, '');
+    if (!str) {
+      return ret;
+    }
+    str.split('&').forEach(function(param) {
+      var parts = param.replace(/\+/g, ' ').split('=');
+      var key = parts.shift();
+      var val = parts.length > 0 ? parts.join('=') : undefined;
+      key = decodeURIComponent(key);
+      val = val === undefined ? null : decodeURIComponent(val);
+      if (ret[key] === undefined) {
+        ret[key] = val;
+      } else if (Array.isArray(ret[key])) {
+        ret[key].push(val);
+      } else {
+        ret[key] = [ret[key], val];
+      }
+    });
+    return ret;
+  };
+  exports.stringify = function(obj, opts) {
+    opts = opts || {};
+    var strict = opts.strict !== false;
+    return obj ? Object.keys(obj).sort().map(function(key) {
+      var val = obj[key];
+      if (val === undefined) {
+        return '';
+      }
+      if (val === null) {
+        return key;
+      }
+      if (Array.isArray(val)) {
+        var result = [];
+        val.slice().sort().forEach(function(val2) {
+          if (val2 === undefined) {
+            return;
+          }
+          if (val2 === null) {
+            result.push(encode(key, strict));
+          } else {
+            result.push(encode(key, strict) + '=' + encode(val2, strict));
+          }
+        });
+        return result.join('&');
+      }
+      return encode(key, strict) + '=' + encode(val, strict);
+    }).filter(function(x) {
+      return x.length > 0;
+    }).join('&') : '';
+  };
+  return module.exports;
+});
+
+System.register("bin/app.js", ["react", "react-dom", "react-select", "query-string"], function(exports_1, context_1) {
   "use strict";
   var __moduleName = context_1 && context_1.id;
   var React,
       ReactDOM,
-      react_select_1;
+      react_select_1,
+      query_string_1;
   var users,
       idToName,
       nameToId,
@@ -13680,6 +13790,41 @@ System.register("bin/app.js", ["react", "react-dom", "react-select"], function(e
       GUI;
   function getUnique(data, attribute) {
     return [...new Set(Object.keys(data).map((k) => data[k]).map((game) => game[attribute]))];
+  }
+  function serializeState(state) {
+    const obj = {
+      map: state.mapFilter && state.mapFilter.map((x) => x.value).join("."),
+      players: state.playerFilter && state.playerFilter.map((x) => x.value).join("."),
+      winner: state.winnerFilter && state.winnerFilter.value,
+      looser: state.looserFilter && state.looserFilter.value
+    };
+    for (const x in obj)
+      if (!obj[x])
+        delete obj[x];
+    console.log(obj);
+    return query_string_1.default.stringify(obj);
+  }
+  function deserializeState(state) {
+    const obj = query_string_1.default.parse(state);
+    return {
+      displayLimit: 200,
+      mapFilter: obj.map ? obj.map.split(".").map((x) => ({
+        value: x,
+        label: x
+      })) : null,
+      playerFilter: obj.players ? obj.players.split(".").map((x) => ({
+        value: +x,
+        label: idToName.get(+x)
+      })) : null,
+      winnerFilter: obj.winner ? {
+        value: +obj.winner,
+        label: idToName.get(+obj.winner)
+      } : null,
+      looserFilter: obj.looser ? {
+        value: +obj.looser,
+        label: idToName.get(+obj.looser)
+      } : null
+    };
   }
   function render(stuff) {
     window.root = ReactDOM.render(stuff, document.querySelector("#root"));
@@ -13697,6 +13842,8 @@ System.register("bin/app.js", ["react", "react-dom", "react-select"], function(e
       ReactDOM = ReactDOM_1;
     }, function(react_select_1_1) {
       react_select_1 = react_select_1_1;
+    }, function(query_string_1_1) {
+      query_string_1 = query_string_1_1;
     }],
     execute: function() {
       idToName = new Map(), nameToId = new Map();
@@ -13752,21 +13899,21 @@ System.register("bin/app.js", ["react", "react-dom", "react-select"], function(e
           ids = ids.slice(0, displayLimit);
           return React.createElement("div", null, React.createElement("div", {className: "row"}, React.createElement("div", {className: "col-sm-3"}, React.createElement("label", null, "Filter map"), React.createElement(react_select_1.default, {
             multi: true,
-            value: this.state.mapFilter,
+            value: mapFilter,
             options: this.maps,
             onChange: (v) => this.setState({mapFilter: v})
           })), React.createElement("div", {className: "col-sm-3"}, React.createElement("label", null, "Filter players"), React.createElement(react_select_1.default, {
             multi: true,
-            value: this.state.playerFilter,
+            value: playerFilter,
             options: this.players,
             onChange: (v) => this.setState({playerFilter: v})
           })), React.createElement("div", {className: "col-sm-3"}, React.createElement("label", null, "Filter winner"), React.createElement(react_select_1.default, {
-            value: this.state.winnerFilter,
-            options: playerFilter.length == 2 ? playerFilter : this.players,
+            value: winnerFilter,
+            options: playerFilter && playerFilter.length == 2 ? playerFilter : this.players,
             onChange: (v) => this.setState({winnerFilter: v})
           })), React.createElement("div", {className: "col-sm-3"}, React.createElement("label", null, "Filter looser"), React.createElement(react_select_1.default, {
-            value: this.state.looserFilter,
-            options: playerFilter.length == 2 ? playerFilter : this.players,
+            value: looserFilter,
+            options: playerFilter && playerFilter.length == 2 ? playerFilter : this.players,
             onChange: (v) => this.setState({looserFilter: v})
           }))), React.createElement("hr", null), React.createElement("div", {className: "alert alert-info"}, "Found ", length, " games"), React.createElement("table", {className: "table table-responsive"}, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "ID"), React.createElement("th", null, "Date"), React.createElement("th", null, "Map"), React.createElement("th", null, "Map Size"), React.createElement("th", null, "Rounds"), React.createElement("th", null, "Winner (Resources) "), React.createElement("th", null, "Looser (Resources) "), React.createElement("th", null, "Replay"))), React.createElement("tbody", null, ids.map((id) => React.createElement(GameRender, {
             key: id,
@@ -13780,6 +13927,9 @@ System.register("bin/app.js", ["react", "react-dom", "react-select"], function(e
             }
           }, "Show more")) : "");
         }
+        componentDidUpdate() {
+          history.replaceState(null, null, "?" + serializeState(this.state));
+        }
       };
       render(React.createElement("div", null, "Loading json..."));
       fetch("../data/usernames.json").then(jsonOrError).then((data) => {
@@ -13789,7 +13939,10 @@ System.register("bin/app.js", ["react", "react-dom", "react-select"], function(e
           idToName.set(id, name);
           nameToId.set(name, id);
         }
-      }).then(() => fetch("../data/games.json")).then(jsonOrError).then((data) => render(React.createElement(GUI, {data: data}))).catch((e) => render(React.createElement("div", {class: "alert alert-danger"}, e.toString())));
+      }).then(() => defaultState = deserializeState(location.search)).then(() => fetch("../data/games.json")).then(jsonOrError).then((data) => render(React.createElement(GUI, {data: data}))).catch((e) => {
+        console.error(e);
+        render(React.createElement("div", {class: "alert alert-danger"}, e.toString()));
+      });
     }
   };
 });

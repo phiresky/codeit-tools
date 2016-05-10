@@ -7,6 +7,7 @@
     },
     "dependencies": {
       "plugin-typescript": "github:frankwallis/plugin-typescript@^4.0.9",
+      "query-string": "npm:query-string@^4.1.0",
       "react": "npm:react@^15.0.2",
       "react-dom": "npm:react-dom@^15.0.2",
       "react-select": "npm:react-select@^1.0.0-beta13"

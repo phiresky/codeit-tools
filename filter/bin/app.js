@@ -1,10 +1,33 @@
-System.register(['react', 'react-dom', 'react-select'], function(exports_1, context_1) {
+System.register(['react', 'react-dom', 'react-select', 'query-string'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var React, ReactDOM, react_select_1;
+    var React, ReactDOM, react_select_1, query_string_1;
     var users, idToName, nameToId, GameRender, defaultState, GUI;
     function getUnique(data, attribute) {
         return [...new Set(Object.keys(data).map(k => data[k]).map(game => game[attribute]))];
+    }
+    function serializeState(state) {
+        const obj = {
+            map: state.mapFilter && state.mapFilter.map(x => x.value).join("."),
+            players: state.playerFilter && state.playerFilter.map(x => x.value).join("."),
+            winner: state.winnerFilter && state.winnerFilter.value,
+            looser: state.looserFilter && state.looserFilter.value
+        };
+        for (const x in obj)
+            if (!obj[x])
+                delete obj[x];
+        console.log(obj);
+        return query_string_1.default.stringify(obj);
+    }
+    function deserializeState(state) {
+        const obj = query_string_1.default.parse(state);
+        return {
+            displayLimit: 200,
+            mapFilter: obj.map ? obj.map.split(".").map((x) => ({ value: x, label: x })) : null,
+            playerFilter: obj.players ? obj.players.split(".").map((x) => ({ value: +x, label: idToName.get(+x) })) : null,
+            winnerFilter: obj.winner ? { value: +obj.winner, label: idToName.get(+obj.winner) } : null,
+            looserFilter: obj.looser ? { value: +obj.looser, label: idToName.get(+obj.looser) } : null
+        };
     }
     function render(stuff) {
         window.root = ReactDOM.render(stuff, document.querySelector("#root"));
@@ -25,6 +48,9 @@ System.register(['react', 'react-dom', 'react-select'], function(exports_1, cont
             },
             function (react_select_1_1) {
                 react_select_1 = react_select_1_1;
+            },
+            function (query_string_1_1) {
+                query_string_1 = query_string_1_1;
             }],
         execute: function() {
             idToName = new Map(), nameToId = new Map();
@@ -86,16 +112,16 @@ System.register(['react', 'react-dom', 'react-select'], function(exports_1, cont
                         React.createElement("div", {className: "row"}, 
                             React.createElement("div", {className: "col-sm-3"}, 
                                 React.createElement("label", null, "Filter map"), 
-                                React.createElement(react_select_1.default, {multi: true, value: this.state.mapFilter, options: this.maps, onChange: v => this.setState({ mapFilter: v })})), 
+                                React.createElement(react_select_1.default, {multi: true, value: mapFilter, options: this.maps, onChange: v => this.setState({ mapFilter: v })})), 
                             React.createElement("div", {className: "col-sm-3"}, 
                                 React.createElement("label", null, "Filter players"), 
-                                React.createElement(react_select_1.default, {multi: true, value: this.state.playerFilter, options: this.players, onChange: v => this.setState({ playerFilter: v })})), 
+                                React.createElement(react_select_1.default, {multi: true, value: playerFilter, options: this.players, onChange: v => this.setState({ playerFilter: v })})), 
                             React.createElement("div", {className: "col-sm-3"}, 
                                 React.createElement("label", null, "Filter winner"), 
-                                React.createElement(react_select_1.default, {value: this.state.winnerFilter, options: playerFilter.length == 2 ? playerFilter : this.players, onChange: v => this.setState({ winnerFilter: v })})), 
+                                React.createElement(react_select_1.default, {value: winnerFilter, options: playerFilter && playerFilter.length == 2 ? playerFilter : this.players, onChange: v => this.setState({ winnerFilter: v })})), 
                             React.createElement("div", {className: "col-sm-3"}, 
                                 React.createElement("label", null, "Filter looser"), 
-                                React.createElement(react_select_1.default, {value: this.state.looserFilter, options: playerFilter.length == 2 ? playerFilter : this.players, onChange: v => this.setState({ looserFilter: v })}))), 
+                                React.createElement(react_select_1.default, {value: looserFilter, options: playerFilter && playerFilter.length == 2 ? playerFilter : this.players, onChange: v => this.setState({ looserFilter: v })}))), 
                         React.createElement("hr", null), 
                         React.createElement("div", {className: "alert alert-info"}, 
                             "Found ", 
@@ -121,6 +147,9 @@ System.register(['react', 'react-dom', 'react-select'], function(exports_1, cont
                                 " ", 
                                 React.createElement("a", {href: "#", onClick: e => { e.preventDefault(); this.setState({ displayLimit: displayLimit * 2 }); }}, "Show more")) : "");
                 }
+                componentDidUpdate() {
+                    history.replaceState(null, null, "?" + serializeState(this.state));
+                }
             };
             render(React.createElement("div", null, "Loading json..."));
             fetch("../data/usernames.json")
@@ -131,10 +160,12 @@ System.register(['react', 'react-dom', 'react-select'], function(exports_1, cont
                     idToName.set(id, name);
                     nameToId.set(name, id);
                 }
-            }).then(() => fetch("../data/games.json"))
+            })
+                .then(() => defaultState = deserializeState(location.search))
+                .then(() => fetch("../data/games.json"))
                 .then(jsonOrError)
                 .then((data) => render(React.createElement(GUI, {data: data})))
-                .catch((e) => render(React.createElement("div", {class: "alert alert-danger"}, e.toString())));
+                .catch((e) => { console.error(e); render(React.createElement("div", {class: "alert alert-danger"}, e.toString())); });
         }
     }
 });

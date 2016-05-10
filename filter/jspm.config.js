@@ -32,6 +32,7 @@ SystemJS.config({
 		"path": "github:jspm/nodelibs-path@0.2.0-alpha",
 		"plugin-typescript": "github:frankwallis/plugin-typescript@4.0.9",
 		"process": "github:jspm/nodelibs-process@0.2.0-alpha",
+		"query-string": "npm:query-string@4.1.0",
 		"react": "npm:react@15.0.2",
 		"react-dom": "npm:react-dom@15.0.2",
 		"react-select": "npm:react-select@1.0.0-beta13",
@@ -134,6 +135,11 @@ SystemJS.config({
 		"npm:promise@7.1.1": {
 			"map": {
 				"asap": "npm:asap@2.0.3"
+			}
+		},
+		"npm:query-string@4.1.0": {
+			"map": {
+				"strict-uri-encode": "npm:strict-uri-encode@1.1.0"
 			}
 		},
 		"npm:react-select@1.0.0-beta13": {

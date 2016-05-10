@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Select from 'react-select';
+import query from 'query-string';
 
 interface DataJSON {
     [id: string]: GameJSON
@@ -37,7 +38,7 @@ class GameRender extends React.Component<{ data: GameJSON, id: number }, {}> {
 function getUnique(data: DataJSON, attribute: string) {
     return [...new Set<string>(Object.keys(data).map(k => data[k]).map(game => (game as any)[attribute]))];
 }
-const defaultState = { displayLimit: 200, mapFilter: [] as ReactSelect.Option[], playerFilter: [] as ReactSelect.Option[], winnerFilter: null as ReactSelect.Option, looserFilter: null as ReactSelect.Option };
+let defaultState = { displayLimit: 200, mapFilter: [] as ReactSelect.Option[], playerFilter: [] as ReactSelect.Option[], winnerFilter: null as ReactSelect.Option, looserFilter: null as ReactSelect.Option };
 class GUI extends React.Component<{ data: DataJSON }, typeof defaultState> {
     maps: ReactSelect.Option[];
     players: ReactSelect.Option[];
@@ -73,19 +74,19 @@ class GUI extends React.Component<{ data: DataJSON }, typeof defaultState> {
             <div className="row">
                 <div className="col-sm-3">
                     <label>Filter map</label>
-                    <Select multi={true} value={this.state.mapFilter} options={this.maps} onChange={v => this.setState({ mapFilter: v }) }/>
+                    <Select multi={true} value={mapFilter} options={this.maps} onChange={v => this.setState({ mapFilter: v }) }/>
                 </div>
                 <div className="col-sm-3">
                     <label>Filter players</label>
-                    <Select multi={true} value={this.state.playerFilter} options={this.players} onChange={v => this.setState({ playerFilter: v }) } />
+                    <Select multi={true} value={playerFilter} options={this.players} onChange={v => this.setState({ playerFilter: v }) } />
                 </div>
                 <div className="col-sm-3">
                     <label>Filter winner</label>
-                    <Select value={this.state.winnerFilter} options={playerFilter.length == 2 ? playerFilter : this.players} onChange={v => this.setState({ winnerFilter: v }) } />
+                    <Select value={winnerFilter} options={playerFilter && playerFilter.length == 2 ? playerFilter : this.players} onChange={v => this.setState({ winnerFilter: v }) } />
                 </div>
                 <div className="col-sm-3">
                     <label>Filter looser</label>
-                    <Select value={this.state.looserFilter} options={playerFilter.length == 2 ? playerFilter : this.players} onChange={v => this.setState({ looserFilter: v }) } />
+                    <Select value={looserFilter} options={playerFilter && playerFilter.length == 2 ? playerFilter : this.players} onChange={v => this.setState({ looserFilter: v }) } />
                 </div>
             </div>
             <hr/>
@@ -115,6 +116,31 @@ class GUI extends React.Component<{ data: DataJSON }, typeof defaultState> {
                 </div> : ""}
         </div>;
     }
+    componentDidUpdate() {
+        history.replaceState(null, null, "?" + serializeState(this.state));
+    }
+}
+
+function serializeState(state: typeof defaultState) {
+    const obj: any = {
+        map: state.mapFilter && state.mapFilter.map(x => x.value).join("."),
+        players: state.playerFilter && state.playerFilter.map(x => x.value).join("."),
+        winner: state.winnerFilter && state.winnerFilter.value,
+        looser: state.looserFilter && state.looserFilter.value
+    };
+    for (const x in obj) if (!obj[x]) delete obj[x];
+    console.log(obj);
+    return query.stringify(obj);
+}
+function deserializeState(state: string): typeof defaultState {
+    const obj: any = query.parse(state);
+    return {
+        displayLimit: 200,
+        mapFilter: obj.map ? obj.map.split(".").map((x: string) => ({ value: x, label: x })) : null,
+        playerFilter: obj.players ? obj.players.split(".").map((x: string) => ({ value: +x, label: idToName.get(+x) })) : null,
+        winnerFilter: obj.winner ? { value: +obj.winner, label: idToName.get(+obj.winner) } : null,
+        looserFilter: obj.looser ? { value: +obj.looser, label: idToName.get(+obj.looser) } : null
+    }
 }
 
 function render(stuff: any) {
@@ -125,6 +151,7 @@ function jsonOrError(resp: Response) {
     if (resp.ok) return resp.json();
     else throw resp.status + " " + resp.statusText;
 }
+
 fetch("../data/usernames.json")
     .then(jsonOrError)
     .then((data: UsernameJSON) => {
@@ -132,7 +159,9 @@ fetch("../data/usernames.json")
         for (const {id, name} of data) {
             idToName.set(id, name); nameToId.set(name, id);
         }
-    }).then(() => fetch("../data/games.json"))
+    })
+    .then(() => defaultState = deserializeState(location.search))
+    .then(() => fetch("../data/games.json"))
     .then(jsonOrError)
     .then((data: DataJSON) => render(<GUI data={data} />))
-    .catch((e: any) => render(<div class="alert alert-danger">{e.toString() }</div>));
+    .catch((e: any) => { console.error(e); render(<div class="alert alert-danger">{e.toString() }</div>) });
