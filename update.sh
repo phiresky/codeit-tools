@@ -1,4 +1,4 @@
 echo getting usernames
-./getUsernames.js > data/usernames.json
+node ./getUsernames.js > data/usernames.json
 echo getting games
-./getGames.js
+node ./getGames.js
