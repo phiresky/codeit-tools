@@ -1,8 +1,8 @@
-System.register(['react', 'react-dom', 'react-select', 'query-string'], function(exports_1, context_1) {
+System.register(['react', 'react-dom', 'react-select', 'query-string', "reactable"], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var React, ReactDOM, react_select_1, query_string_1;
-    var users, idToName, nameToId, GameRender, defaultState, GUI;
+    var React, ReactDOM, react_select_1, query_string_1, Reactable;
+    var Table, Tr, Td, Thead, Th, users, idToName, nameToId, GameRender, defaultState, GUI;
     function getUnique(data, attribute) {
         return [...new Set(Object.keys(data).map(k => data[k]).map(game => game[attribute]))];
     }
@@ -51,30 +51,26 @@ System.register(['react', 'react-dom', 'react-select', 'query-string'], function
             },
             function (query_string_1_1) {
                 query_string_1 = query_string_1_1;
+            },
+            function (Reactable_1) {
+                Reactable = Reactable_1;
             }],
         execute: function() {
+            Table = Reactable.Table, Tr = Reactable.Tr, Td = Reactable.Td, Thead = Reactable.Thead, Th = Reactable.Th;
             idToName = new Map(), nameToId = new Map();
-            GameRender = class GameRender extends React.Component {
-                render() {
-                    const { data, id } = this.props;
+            GameRender = class GameRender {
+                static get(data, id) {
                     const hrefs = data.ranking.map(id => React.createElement("a", {href: `https://codeit.itdhosting.de:1337/profile.php?id=${id}`}, idToName.get(id)));
-                    return React.createElement("tr", null, 
-                        React.createElement("td", null, id), 
-                        React.createElement("td", null, data.date), 
-                        React.createElement("td", null, data.map), 
-                        React.createElement("td", null, data.mapSize), 
-                        React.createElement("td", null, data.rounds), 
-                        React.createElement("td", null, 
-                            hrefs[0], 
-                            " (", 
-                            data.resources[0], 
-                            ") "), 
-                        React.createElement("td", null, 
-                            hrefs[1], 
-                            " (", 
-                            data.resources[1], 
-                            ") "), 
-                        React.createElement("td", null, 
+                    return React.createElement(Tr, {key: id}, 
+                        React.createElement(Td, {column: "ID"}, id), 
+                        React.createElement(Td, {column: "Date"}, data.date), 
+                        React.createElement(Td, {column: "Map"}, data.map), 
+                        React.createElement(Td, {column: "Map Size"}, data.mapSize), 
+                        React.createElement(Td, {column: "Winner"}, hrefs[0]), 
+                        React.createElement(Td, {column: "WinnerRes"}, data.resources[0]), 
+                        React.createElement(Td, {column: "Looser"}, hrefs[1]), 
+                        React.createElement(Td, {column: "LooserRes"}, data.resources[1]), 
+                        React.createElement(Td, {column: "Replay"}, 
                             React.createElement("a", {href: `https://codeit.itdhosting.de:1337/replay.php?game=${id}`}, "Show Replay")
                         ));
                 }
@@ -106,8 +102,7 @@ System.register(['react', 'react-dom', 'react-select', 'query-string'], function
                             ids.push(id);
                         }
                     }
-                    const length = ids.length;
-                    ids = ids.slice(0, displayLimit);
+                    length = ids.length;
                     return React.createElement("div", null, 
                         React.createElement("div", {className: "row"}, 
                             React.createElement("div", {className: "col-sm-3"}, 
@@ -127,25 +122,19 @@ System.register(['react', 'react-dom', 'react-select', 'query-string'], function
                             "Found ", 
                             length, 
                             " games"), 
-                        React.createElement("table", {className: "table table-responsive"}, 
-                            React.createElement("thead", null, 
-                                React.createElement("tr", null, 
-                                    React.createElement("th", null, "ID"), 
-                                    React.createElement("th", null, "Date"), 
-                                    React.createElement("th", null, "Map"), 
-                                    React.createElement("th", null, "Map Size"), 
-                                    React.createElement("th", null, "Rounds"), 
-                                    React.createElement("th", null, "Winner (Resources) "), 
-                                    React.createElement("th", null, "Looser (Resources) "), 
-                                    React.createElement("th", null, "Replay"))
-                            ), 
-                            React.createElement("tbody", null, ids.map(id => React.createElement(GameRender, {key: id, id: +id, data: data[id]})))), 
-                        length > displayLimit ?
-                            React.createElement("div", {className: "alert alert-danger"}, 
-                                length - displayLimit, 
-                                " more not displayed.", 
-                                " ", 
-                                React.createElement("a", {href: "#", onClick: e => { e.preventDefault(); this.setState({ displayLimit: displayLimit * 2 }); }}, "Show more")) : "");
+                        React.createElement(Table, {className: "table", id: "table", itemsPerPage: 40, pageButtonLimit: 10, sortable: true}, 
+                            React.createElement(Thead, null, 
+                                React.createElement(Th, {column: "ID"}, "ID"), 
+                                React.createElement(Th, {column: "Date"}, "Date"), 
+                                React.createElement(Th, {column: "Map"}, "Map"), 
+                                React.createElement(Th, {column: "Map Size"}, "Map Size"), 
+                                React.createElement(Th, {column: "Winner"}, "Winner"), 
+                                React.createElement(Th, {column: "WinnerRes"}, "Winner Resources"), 
+                                React.createElement(Th, {column: "Looser"}, "Looser"), 
+                                React.createElement(Th, {column: "LooserRes"}, "Looser Resources"), 
+                                React.createElement(Th, {column: "Replay"}, "Replay")), 
+                            ids.map(id => GameRender.get(data[id], id))), 
+                        ",");
                 }
                 componentDidUpdate() {
                     history.replaceState(null, null, "?" + serializeState(this.state));

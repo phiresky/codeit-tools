@@ -2,6 +2,13 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Select from 'react-select';
 import query from 'query-string';
+import * as Reactable from "reactable";
+
+var Table = Reactable.Table,
+    Tr = Reactable.Tr,
+    Td = Reactable.Td,
+    Thead = Reactable.Thead,
+    Th = Reactable.Th;
 
 interface DataJSON {
     [id: string]: GameJSON
@@ -19,25 +26,28 @@ type UsernameJSON = { id: number, name: string }[];
 let users: UsernameJSON;
 let idToName = new Map<number, string>(), nameToId = new Map<string, number>();
 
-class GameRender extends React.Component<{ data: GameJSON, id: number }, {}> {
-    render() {
-        const {data, id} = this.props;
+class GameRender {
+    static get(data: GameJSON, id: number) {
+        
         const hrefs = data.ranking.map(id => <a href={`https://codeit.itdhosting.de:1337/profile.php?id=${id}`}>{idToName.get(id) }</a>);
-        return <tr>
-            <td>{id}</td>
-            <td>{data.date}</td>
-            <td>{data.map}</td>
-            <td>{data.mapSize}</td>
-            <td>{data.rounds}</td>
-            <td>{hrefs[0]} ({data.resources[0]}) </td>
-            <td>{hrefs[1]} ({data.resources[1]}) </td>
-            <td><a href={`https://codeit.itdhosting.de:1337/replay.php?game=${id}`}>Show Replay</a></td>
-        </tr>;
+        return <Tr key={id}>
+            <Td column="ID">{id}</Td>
+            <Td column="Date">{data.date}</Td>
+            <Td column="Map">{data.map}</Td>
+            <Td column="Map Size">{data.mapSize}</Td>
+            <Td column="Winner">{hrefs[0]}</Td>
+            <Td column="WinnerRes">{data.resources[0]}</Td>
+            <Td column="Looser">{hrefs[1]}</Td>
+            <Td column="LooserRes">{data.resources[1]}</Td>
+            <Td column="Replay"><a href={`https://codeit.itdhosting.de:1337/replay.php?game=${id}`}>Show Replay</a></Td>
+        </Tr>;
     }
 }
+
 function getUnique(data: DataJSON, attribute: string) {
     return [...new Set<string>(Object.keys(data).map(k => data[k]).map(game => (game as any)[attribute]))];
 }
+
 let defaultState = { displayLimit: 200, mapFilter: [] as ReactSelect.Option[], playerFilter: [] as ReactSelect.Option[], winnerFilter: null as ReactSelect.Option, looserFilter: null as ReactSelect.Option };
 class GUI extends React.Component<{ data: DataJSON }, typeof defaultState> {
     maps: ReactSelect.Option[];
@@ -68,8 +78,9 @@ class GUI extends React.Component<{ data: DataJSON }, typeof defaultState> {
                 ids.push(id);
             }
         }
-        const length = ids.length;
-        ids = ids.slice(0, displayLimit);
+        
+        length = ids.length;
+
         return <div>
             <div className="row">
                 <div className="col-sm-3">
@@ -91,29 +102,21 @@ class GUI extends React.Component<{ data: DataJSON }, typeof defaultState> {
             </div>
             <hr/>
             <div className="alert alert-info">Found {length} games</div>
-            <table className="table table-responsive">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Date</th>
-                        <th>Map</th>
-                        <th>Map Size</th>
-                        <th>Rounds</th>
-                        <th>Winner (Resources) </th>
-                        <th>Looser (Resources) </th>
-                        <th>Replay</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {ids.map(id =>
-                        <GameRender key={id} id={+id} data={data[id]} />
-                    ) }
-                </tbody>
-            </table>
-            {length > displayLimit ?
-                <div className="alert alert-danger">{length - displayLimit} more not displayed.{" "}
-                    <a href="#" onClick={e => { e.preventDefault(); this.setState({ displayLimit: displayLimit * 2 }) } }>Show more</a>
-                </div> : ""}
+
+            <Table className="table" id="table" itemsPerPage={40} pageButtonLimit={10} sortable={true}>
+                <Thead>
+                    <Th column="ID">ID</Th>
+                    <Th column="Date">Date</Th>
+                    <Th column="Map">Map</Th>
+                    <Th column="Map Size">Map Size</Th>
+                    <Th column="Winner">Winner</Th>
+                    <Th column="WinnerRes">Winner Resources</Th>
+                    <Th column="Looser">Looser</Th>
+                    <Th column="LooserRes">Looser Resources</Th>
+                    <Th column="Replay">Replay</Th>
+                </Thead>
+                {ids.map(id => GameRender.get(data[id], id)) }
+            </Table>,
         </div>;
     }
     componentDidUpdate() {

@@ -10,7 +10,8 @@
       "query-string": "npm:query-string@^4.1.0",
       "react": "npm:react@^15.0.2",
       "react-dom": "npm:react-dom@^15.0.2",
-      "react-select": "npm:react-select@^1.0.0-beta13"
+      "react-select": "npm:react-select@^1.0.0-beta13",
+      "reactable": "npm:reactable@^0.13.0"
     },
     "peerDependencies": {
       "assert": "github:jspm/nodelibs-assert@^0.2.0-alpha",
@@ -57,4 +58,4 @@
       }
     }
   }
-}
+}

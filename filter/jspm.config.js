@@ -36,6 +36,7 @@ SystemJS.config({
 		"react": "npm:react@15.0.2",
 		"react-dom": "npm:react-dom@15.0.2",
 		"react-select": "npm:react-select@1.0.0-beta13",
+		"reactable": "npm:reactable@0.13.0",
 		"stream": "github:jspm/nodelibs-stream@0.2.0-alpha",
 		"string_decoder": "github:jspm/nodelibs-string_decoder@0.2.0-alpha",
 		"url": "github:jspm/nodelibs-url@0.2.0-alpha",
@@ -110,7 +111,7 @@ SystemJS.config({
 			"map": {
 				"core-js": "npm:core-js@1.2.6",
 				"isomorphic-fetch": "npm:isomorphic-fetch@2.2.1",
-				"loose-envify": "npm:loose-envify@1.1.0",
+				"loose-envify": "npm:loose-envify@1.2.0",
 				"promise": "npm:promise@7.1.1",
 				"ua-parser-js": "npm:ua-parser-js@0.7.10"
 			}
@@ -121,7 +122,7 @@ SystemJS.config({
 				"whatwg-fetch": "npm:whatwg-fetch@1.0.0"
 			}
 		},
-		"npm:loose-envify@1.1.0": {
+		"npm:loose-envify@1.2.0": {
 			"map": {
 				"js-tokens": "npm:js-tokens@1.0.3"
 			}
@@ -151,7 +152,7 @@ SystemJS.config({
 		"npm:react@15.0.2": {
 			"map": {
 				"fbjs": "npm:fbjs@0.8.2",
-				"loose-envify": "npm:loose-envify@1.1.0",
+				"loose-envify": "npm:loose-envify@1.2.0",
 				"object-assign": "npm:object-assign@4.1.0"
 			}
 		},
