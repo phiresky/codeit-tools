@@ -136,15 +136,17 @@ System.register(['react', 'react-dom', 'react-select', 'query-string'], function
                             "Found ", 
                             count, 
                             " games"), 
-                        React.createElement("table", {className: "table", data: ids}, 
-                            React.createElement("thead", null, 
-                                React.createElement("tr", null, "ID,Date,Map,Map Size,Winner,Winner Resources,Looser,Looser Resources,Replay".split(",").map(name => React.createElement("th", {key: name}, 
-                                    React.createElement("a", {href: "#", onClick: e => this.setSort(e, name)}, 
-                                        name, 
-                                        this.state.sortColumn === name ? this.state.sortReverse ? "▼" : "▲" : "")
-                                )))
-                            ), 
-                            React.createElement("tbody", null, ids.map(id => renderTableRow(data[id], id)))), 
+                        React.createElement("div", {className: "table-responsive"}, 
+                            React.createElement("table", {className: "table", data: ids}, 
+                                React.createElement("thead", null, 
+                                    React.createElement("tr", null, "ID,Date,Map,Map Size,Winner,Winner Resources,Looser,Looser Resources,Replay".split(",").map(name => React.createElement("th", {key: name}, 
+                                        React.createElement("a", {href: "#", onClick: e => this.setSort(e, name)}, 
+                                            name, 
+                                            this.state.sortColumn === name ? this.state.sortReverse ? "▼" : "▲" : "")
+                                    )))
+                                ), 
+                                React.createElement("tbody", null, ids.map(id => renderTableRow(data[id], id))))
+                        ), 
                         count > displayLimit ?
                             React.createElement("div", {className: "alert alert-danger"}, 
                                 count - displayLimit, 

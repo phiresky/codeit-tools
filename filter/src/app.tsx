@@ -108,13 +108,15 @@ class GUI extends React.Component<{ data: DataJSON }, State> {
             </div>
             <hr/>
             <div className="alert alert-info">Found {count} games</div>
-
-            <table className="table" data={ids}>
-                <thead><tr>{"ID,Date,Map,Map Size,Winner,Winner Resources,Looser,Looser Resources,Replay".split(",").map(name =>
-                    <th key={name}><a href="#" onClick={e => this.setSort(e, name) }>{name}{this.state.sortColumn === name ? this.state.sortReverse ? "▼" : "▲" : ""}</a></th>) }
-                </tr></thead>
-                <tbody>{ids.map(id => renderTableRow(data[id], id)) }</tbody>
-            </table>
+            
+            <div className="table-responsive">
+                <table className="table" data={ids}>
+                    <thead><tr>{"ID,Date,Map,Map Size,Winner,Winner Resources,Looser,Looser Resources,Replay".split(",").map(name =>
+                        <th key={name}><a href="#" onClick={e => this.setSort(e, name) }>{name}{this.state.sortColumn === name ? this.state.sortReverse ? "▼" : "▲" : ""}</a></th>) }
+                    </tr></thead>
+                    <tbody>{ids.map(id => renderTableRow(data[id], id)) }</tbody>
+                </table>
+            </div>
             {count > displayLimit ?
                 <div className="alert alert-danger">{count - displayLimit} more not displayed.{" "}
                     <a href="#" onClick={e => { e.preventDefault(); this.setState({ displayLimit: displayLimit * 2 }) } }>Show more</a>
