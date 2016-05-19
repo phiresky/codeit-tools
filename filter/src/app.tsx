@@ -25,8 +25,8 @@ function renderTableRow(data: GameJSON, id: number) {
 }
 
 interface State {
-    mapFilter: ReactSelect.Option[]; playerFilter: ReactSelect.Option[];
-    winnerFilter: ReactSelect.Option; looserFilter: ReactSelect.Option;
+    mapFilter: ReactSelect.Option[] | undefined; playerFilter: ReactSelect.Option[] | undefined;
+    winnerFilter: ReactSelect.Option | undefined; looserFilter: ReactSelect.Option | undefined;
     sortColumn: string; sortReverse: boolean; displayLimit: number;
 }
 
@@ -124,7 +124,7 @@ class GUI extends React.Component<{ data: DataJSON }, State> {
         </div>;
     }
     componentDidUpdate() {
-        history.replaceState(null, null, "?" + serializeState(this.state));
+        history.replaceState(null, undefined, "?" + serializeState(this.state));
     }
 }
 
@@ -144,10 +144,10 @@ function deserializeState(state: string): State {
     const obj: any = query.parse(state);
     return {
         displayLimit: 100,
-        mapFilter: obj.map ? obj.map.split(".").map((x: string) => ({ value: x, label: x })) : null,
-        playerFilter: obj.players ? obj.players.split(".").map((x: string) => ({ value: +x, label: idToName.get(+x) })) : null,
-        winnerFilter: obj.winner ? { value: +obj.winner, label: idToName.get(+obj.winner) } : null,
-        looserFilter: obj.looser ? { value: +obj.looser, label: idToName.get(+obj.looser) } : null,
+        mapFilter: obj.map ? obj.map.split(".").map((x: string) => ({ value: x, label: x })) : undefined,
+        playerFilter: obj.players ? obj.players.split(".").map((x: string) => ({ value: +x, label: idToName.get(+x) })) : undefined,
+        winnerFilter: obj.winner ? { value: +obj.winner, label: idToName.get(+obj.winner) || "?" } : undefined,
+        looserFilter: obj.looser ? { value: +obj.looser, label: idToName.get(+obj.looser) || "?" } : undefined,
         sortColumn: obj.sort || "ID", sortReverse: typeof obj.reverse === "undefined" ? true : !!obj.reverse,
     }
 }

@@ -36,7 +36,6 @@ SystemJS.config({
 		"react": "npm:react@15.0.2",
 		"react-dom": "npm:react-dom@15.0.2",
 		"react-select": "npm:react-select@1.0.0-beta13",
-		"reactable": "npm:reactable@0.13.0",
 		"stream": "github:jspm/nodelibs-stream@0.2.0-alpha",
 		"string_decoder": "github:jspm/nodelibs-string_decoder@0.2.0-alpha",
 		"url": "github:jspm/nodelibs-url@0.2.0-alpha",
